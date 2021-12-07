@@ -282,3 +282,99 @@ ALTER TABLE myschema.menu_item
     OWNER to postgres;
 --------------------------------------------------------------------
    
+-- subway
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.subway_subway_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.subway_subway_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.subway
+(
+    subway_id integer NOT NULL DEFAULT nextval('myschema.subway_subway_id_seq'::regclass),
+    name character varying COLLATE pg_catalog."default" NOT NULL,
+    city_id int , 
+    CONSTRAINT subway_id_pkey PRIMARY KEY (subway_id),
+    CONSTRAINT subway_city_id_fkey FOREIGN KEY (city_id)
+        REFERENCES myschema.city (city_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.subway
+    OWNER to postgres;
+--------------------------------------------------------------------
+
+-- theater
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.theater_theater_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.theater_theater_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.theater
+(
+    theater_id integer NOT NULL DEFAULT nextval('myschema.theater_theater_id_seq'::regclass),
+    address character varying COLLATE pg_catalog."default",
+    city_id int , 
+    subway_id int,
+    CONSTRAINT theater_id_pkey PRIMARY KEY (theater_id),
+    CONSTRAINT theater_city_id_fkey FOREIGN KEY (city_id)
+        REFERENCES myschema.city (city_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict,
+     CONSTRAINT theater_subway_id_fkey FOREIGN KEY (subway_id)
+        REFERENCES myschema.subway (subway_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.theater
+    OWNER to postgres;
+--------------------------------------------------------------------
+   
+-- pos_theater
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.theater_theater_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.theater_theater_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.pos_theater
+(
+    pos_theater_id integer NOT NULL DEFAULT nextval('myschema.theater_theater_id_seq'::regclass),
+    position_id int not null,
+    theater_id int not null, 
+    CONSTRAINT pos_theater_id_pkey PRIMARY KEY (pos_theater_id),
+    CONSTRAINT theater_theater_id_fkey FOREIGN KEY (theater_id)
+        REFERENCES myschema.theater (theater_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict,
+     CONSTRAINT pos_theater_position_id_fkey FOREIGN KEY (position_id)
+        REFERENCES myschema.position (position_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.pos_theater
+    OWNER to postgres;
+--------------------------------------------------------------------
+
