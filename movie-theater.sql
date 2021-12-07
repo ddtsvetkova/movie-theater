@@ -201,5 +201,84 @@ ALTER TABLE myschema.offer
 --------------------------------------------------------------------
 
 
+-- position
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.position_position_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
 
+ALTER SEQUENCE myschema.position_position_id_seq
+    OWNER TO postgres;
 
+CREATE TABLE IF NOT EXISTS myschema.position
+(
+    position_id integer NOT NULL DEFAULT nextval('myschema.position_position_id_seq'::regclass),
+    name character varying COLLATE pg_catalog."default" NOT NULL,
+    salary numeric, 
+    CONSTRAINT position_pkey PRIMARY KEY (position_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.position
+    OWNER to postgres;
+--------------------------------------------------------------------
+   
+
+-- client
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.client_client_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.client_client_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.client
+(
+    client_id integer NOT NULL DEFAULT nextval('myschema.position_position_id_seq'::regclass),
+    client_name character varying COLLATE pg_catalog."default", 
+    email character varying COLLATE pg_catalog."default", 
+    phone character varying COLLATE pg_catalog."default", 
+    CONSTRAINT client_pkey PRIMARY KEY (client_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.client
+    OWNER to postgres;
+--------------------------------------------------------------------
+   
+   
+-- menu_item
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.menu_item_menu_item_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.menu_item_menu_item_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.menu_item
+(
+    menu_item_id integer NOT NULL DEFAULT nextval('myschema.menu_item_menu_item_id_seq'::regclass),
+    menu_item_name character varying COLLATE pg_catalog."default" NOT NULL,
+    price  int check price > 0, 
+    CONSTRAINT menu_item_pkey PRIMARY KEY (menu_item_id),
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.menu_item
+    OWNER to postgres;
+--------------------------------------------------------------------
+   
