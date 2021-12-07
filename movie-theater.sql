@@ -272,8 +272,8 @@ CREATE TABLE IF NOT EXISTS myschema.menu_item
 (
     menu_item_id integer NOT NULL DEFAULT nextval('myschema.menu_item_menu_item_id_seq'::regclass),
     menu_item_name character varying COLLATE pg_catalog."default" NOT NULL,
-    price  int check price > 0, 
-    CONSTRAINT menu_item_pkey PRIMARY KEY (menu_item_id),
+    price integer CHECK (price > 0), 
+    CONSTRAINT menu_item_pkey PRIMARY KEY (menu_item_id)
 )
 
 TABLESPACE pg_default;
@@ -347,19 +347,19 @@ ALTER TABLE myschema.theater
    
 -- pos_theater
 --------------------------------------------------------------------
-CREATE SEQUENCE myschema.theater_theater_id_seq
+CREATE SEQUENCE myschema.pos_theater_pos_theater_id_seq
     INCREMENT 1
     START 1
     MINVALUE 1
     MAXVALUE 2147483647
     CACHE 1;
 
-ALTER SEQUENCE myschema.theater_theater_id_seq
+ALTER SEQUENCE myschema.pos_theater_pos_theater_id_seq
     OWNER TO postgres;
 
 CREATE TABLE IF NOT EXISTS myschema.pos_theater
 (
-    pos_theater_id integer NOT NULL DEFAULT nextval('myschema.theater_theater_id_seq'::regclass),
+    pos_theater_id integer NOT NULL DEFAULT nextval('myschema.pos_theater_pos_theater_id_seq'::regclass),
     position_id int not null,
     theater_id int not null, 
     CONSTRAINT pos_theater_id_pkey PRIMARY KEY (pos_theater_id),
