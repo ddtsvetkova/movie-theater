@@ -404,8 +404,8 @@ ALTER TABLE myschema.employee
    
 -- movie
 --------------------------------------------------------------------
-create type public.status as enum('скоро на экранах', 'новинка', 'уже в кино', 'вышел из проката');
-create type public.rating as enum('0+', '6+', '12+', '16+',' 18+', 'G', 'PG','PG-13', 'R', 'NC-17')
+create type myschema.status as enum('скоро на экранах', 'новинка', 'уже в кино', 'вышел из проката');
+create type myschema.rating as enum('0+', '6+', '12+', '16+',' 18+')
 
 CREATE SEQUENCE myschema.movie_movie_id_seq
     INCREMENT 1
@@ -424,8 +424,8 @@ CREATE TABLE IF NOT EXISTS myschema.movie
 	description text,
     duration interval NOT NULL,
 	language_id int,
-	rating public.rating not null,
-	status public.status NOT NULL,
+	rating myschema.rating not null,
+	status myschema.status NOT NULL,
     CONSTRAINT movie_id_pkey PRIMARY KEY (movie_id),
     CONSTRAINT movie_language_id_fkey FOREIGN KEY (language_id)
         REFERENCES myschema.language (language_id) MATCH SIMPLE
