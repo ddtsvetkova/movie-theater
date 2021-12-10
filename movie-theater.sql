@@ -377,4 +377,63 @@ TABLESPACE pg_default;
 ALTER TABLE myschema.pos_theater
     OWNER to postgres;
 --------------------------------------------------------------------
+   
+-- employee
+--------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS myschema.employee
+(
+    employee_id character varying (5) COLLATE pg_catalog."default" NOT NULL,
+    last_name character varying COLLATE pg_catalog."default" NOT NULL,
+	first_name character varying COLLATE pg_catalog."default" NOT NULL,
+	second_name character varying COLLATE pg_catalog."default",
+    birth date,
+	email character varying COLLATE pg_catalog."default",
+	pos_theater_id int not null,
+	passport character(11) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT employee_id_pkey PRIMARY KEY (employee_id),
+    CONSTRAINT employee_theater_id_fkey FOREIGN KEY (pos_theater_id)
+        REFERENCES myschema.pos_theater (pos_theater_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict
+)
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.employee
+    OWNER to postgres;
+--------------------------------------------------------------------
+   
+-- movie
+--------------------------------------------------------------------
+create type public.status as enum('скоро на экранах', 'новинка', 'уже в кино', 'вышел из проката');
+create type public.rating as enum('0+', '6+', '12+', '16+',' 18+', 'G', 'PG','PG-13', 'R', 'NC-17')
+
+CREATE SEQUENCE myschema.movie_movie_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.movie_movie_id_seq
+    OWNER TO postgres;
+CREATE TABLE IF NOT EXISTS myschema.movie
+(
+    movie_id integer NOT NULL DEFAULT nextval('myschema.movie_movie_id_seq'::regclass),
+    title character varying COLLATE pg_catalog."default" NOT NULL,
+	release date,
+	description text,
+    duration interval NOT NULL,
+	language_id int,
+	rating public.rating not null,
+	status public.status NOT NULL,
+    CONSTRAINT movie_id_pkey PRIMARY KEY (movie_id),
+    CONSTRAINT movie_language_id_fkey FOREIGN KEY (language_id)
+        REFERENCES myschema.language (language_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict
+)
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.movie
+    OWNER to postgres;
 
