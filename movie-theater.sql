@@ -436,4 +436,217 @@ TABLESPACE pg_default;
 
 ALTER TABLE myschema.movie
     OWNER to postgres;
+--------------------------------------------------------------------
+
+-- movie_genre
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.movie_genre_movie_genre_id_seq
+	INCREMENT 1
+	START 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	CACHE 1;
+
+ALTER SEQUENCE myschema.movie_genre_movie_genre_id_seq
+	OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.movie_genre
+(
+	movie_genre_id integer NOT NULL DEFAULT nextval('myschema.movie_genre_movie_genre_id_seq'::regclass),
+	movie_id int NOT NULL,
+	genre_id int NOT NULL,
+	CONSTRAINT movie_genre_id_pkey PRIMARY KEY (movie_genre_id),
+	CONSTRAINT movie_genre_movie_id_fkey FOREIGN KEY (movie_id)
+		REFERENCES myschema.movie (movie_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict,
+	CONSTRAINT movie_genre_genre_id_fkey FOREIGN KEY (genre_id)
+		REFERENCES myschema.genre (genre_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.movie_genre
+	OWNER to postgres;
+--------------------------------------------------------------------
+
+-- job_exp
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.job_exp_job_exp_id_seq
+	INCREMENT 1
+	START 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	CACHE 1;
+
+ALTER SEQUENCE myschema.job_exp_job_exp_id_seq
+	OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.job_exp
+(
+	job_exp_id integer NOT NULL DEFAULT nextval('myschema.job_exp_job_exp_id_seq'::regclass),
+	company character varying COLLATE pg_catalog."default" NOT NULL,
+	start_date date,
+	finish_date date,
+	employee_id character varying (5) COLLATE pg_catalog."default" NOT NULL,
+	CONSTRAINT job_exp_id_pkey PRIMARY KEY (job_exp_id),
+	CONSTRAINT job_exp_employee_id_fkey FOREIGN KEY (employee_id)
+		REFERENCES myschema.employee (employee_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.job_exp
+	OWNER to postgres;
+--------------------------------------------------------------------
+
+-- cast_crew
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.cast_crew_cast_crew_id_seq
+	INCREMENT 1
+	START 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	CACHE 1;
+
+ALTER SEQUENCE myschema.cast_crew_cast_crew_id_seq
+	OWNER TO postgres;
+
+
+CREATE TABLE IF NOT EXISTS myschema.cast_crew
+(
+	cast_crew_id integer NOT NULL DEFAULT nextval('myschema.cast_crew_cast_crew_id_seq'::regclass),
+	movie_id int not null,
+	creator_id int not null,
+	cast boolean,
+	role_id int not null,
+	CONSTRAINT cast_crew_id_pkey PRIMARY KEY (cast_crew_id),
+	CONSTRAINT cast_crew_movie_id_fkey FOREIGN KEY (movie_id)
+		REFERENCES myschema.movie (movie_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict,
+	CONSTRAINT cast_crew_creator_id_fkey FOREIGN KEY (creator_id)
+		REFERENCES myschema.creator (creator_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict,
+	CONSTRAINT cast_crew_role_id_fkey FOREIGN KEY (role_id)
+		REFERENCES myschema.role (role_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.cast_crew
+	OWNER to postgres;
+--------------------------------------------------------------------
+
+-- menu_theater
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.menu_theater_menu_theater_id_seq
+	INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.menu_theater_menu_theater_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.menu_theater
+(
+    menu_theater_id integer NOT NULL DEFAULT nextval('myschema.menu_theater_menu_theater_id_seq'::regclass),
+    menu_item_id int NOT NULL,
+	theater_id int NOT NULL,
+    stock integer CHECK (stock >= 0), 
+    CONSTRAINT menu_theater_id_pkey PRIMARY KEY (menu_theater_id),
+	CONSTRAINT menu_theater_menu_item_id_fkey FOREIGN KEY (menu_item_id)
+		REFERENCES myschema.menu_item (menu_item_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict,
+	CONSTRAINT menu_theater_theater_id_fkey FOREIGN KEY (theater_id)
+		REFERENCES myschema.theater (theater_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.menu_theater
+    OWNER to postgres;
+--------------------------------------------------------------------
+
+-- order_item
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.order_item_order_item_id_seq
+	INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.order_item_order_item_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.order_item
+(
+	order_item_id integer NOT NULL DEFAULT nextval('myschema.order_item_order_item_id_seq'::regclass),
+    order_id int NOT NULL,
+	menu_theater_id int NOT NULL,
+	order_amount integer NOT NULL,
+	CONSTRAINT order_item_id_pkey PRIMARY KEY (order_item_id),
+	CONSTRAINT order_item_order_id_fkey FOREIGN KEY (order_id)
+		REFERENCES myschema.order (order_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict,
+	CONSTRAINT order_item_menu_theater_fkey FOREIGN KEY (menu_theater_id)
+		REFERENCES myschema.menu_theater (menu_theater_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.order_item
+    OWNER to postgres;
+--------------------------------------------------------------------
+
+-- screening
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.screening_screening_id_seq
+	INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.screening_screening_id_seq
+    OWNER TO postgres;
+
+CREATE TABLE IF NOT EXISTS myschema.screening
+(
+	screening_id integer NOT NULL DEFAULT nextval('screening_screening_id_seq'::regclass),
+	auditorium_id int NOT NULL,
+	movie_id int NOT NULL,
+	start timestamp without time zone, 
+	price integer CHECK (price > 0),
+	CONSTRAINT screening_id_pkey PRIMARY KEY (screening_id),
+	CONSTRAINT screening_auditorium_id_fkey FOREIGN KEY (auditorium_id)
+		REFERENCES myschema.auditorium (auditorium_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict,
+	CONSTRAINT screening_movie_id_fkey FOREIGN KEY (movie_id)
+		REFERENCES myschema.movie (movie_id) MATCH SIMPLE
+		ON UPDATE CASCADE
+		ON DELETE restrict
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.screening
+    OWNER to postgres;
+--------------------------------------------------------------------
 
