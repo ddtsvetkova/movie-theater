@@ -628,7 +628,11 @@ ALTER SEQUENCE myschema.screening_screening_id_seq
 
 CREATE TABLE IF NOT EXISTS myschema.screening
 (
+<<<<<<< Updated upstream
 	screening_id integer NOT NULL DEFAULT nextval('screening_screening_id_seq'::regclass),
+=======
+	screening_id integer NOT NULL DEFAULT nextval('myschema.screening_screening_id_seq'::regclass),
+>>>>>>> Stashed changes
 	auditorium_id int NOT NULL,
 	movie_id int NOT NULL,
 	start timestamp without time zone, 
@@ -649,4 +653,120 @@ TABLESPACE pg_default;
 ALTER TABLE myschema.screening
     OWNER to postgres;
 --------------------------------------------------------------------
+<<<<<<< Updated upstream
+=======
+   
+-- booking
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.booking_booking_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
 
+ALTER SEQUENCE myschema.booking_booking_id_seq
+    OWNER TO postgres;
+CREATE TABLE IF NOT EXISTS myschema.booking
+(
+    booking_id integer NOT NULL DEFAULT nextval('myschema.booking_booking_id_seq'::regclass),
+    client_id int NOT NULL,
+	screening_id int NOT NULL,
+	offer_id int NOT NULL,
+    booking_time time without time zone,
+	row integer CHECK (row > 0) NOT NUll,
+	number integer CHECK (number > 0) NOT NUll,
+	order_id int NOT NULL,
+    CONSTRAINT booking_id_pkey PRIMARY KEY (booking_id),
+    CONSTRAINT booking_client_id_fkey FOREIGN KEY (client_id)
+        REFERENCES myschema.client (client_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict,
+	CONSTRAINT booking_screening_id_fkey FOREIGN KEY (screening_id)
+        REFERENCES myschema.screening (screening_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict,
+	CONSTRAINT booking_offer_id_fkey FOREIGN KEY (offer_id)
+        REFERENCES myschema.offer (offer_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict,
+	CONSTRAINT booking_order_id_fkey FOREIGN KEY (order_id)
+        REFERENCES myschema.order (order_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict
+)
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.booking
+    OWNER to postgres;
+--------------------------------------------------------------------
+   
+-- auditorium
+--------------------------------------------------------------------
+create type myschema.type as enum('2D', '3D', 'IMAX');
+create type myschema.exp as enum('Standard', 'VIP')
+
+CREATE SEQUENCE myschema.auditorium_auditorium_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.auditorium_auditorium_id_seq
+    OWNER TO postgres;
+	
+CREATE TABLE IF NOT EXISTS myschema.auditorium
+(
+    auditorium_id integer NOT NULL DEFAULT nextval('myschema.auditorium_auditorium_id_seq'::regclass),
+    auditorium_no character varying COLLATE pg_catalog."default" NOT NULL,
+	theater_id int NOT NULL,
+	type myschema.type,
+    experience myschema.exp,
+	accessibility_id int NOT NULL,
+	rows integer CHECK (rows > 0),
+	numbers integer CHECK (numbers > 0),
+    CONSTRAINT auditorium_id_pkey PRIMARY KEY (auditorium_id),
+    CONSTRAINT auditorium_theater_id_fkey FOREIGN KEY (theater_id)
+        REFERENCES myschema.theater (theater_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict,
+	CONSTRAINT auditorium_accessibility_id_fkey FOREIGN KEY (accessibility_id)
+        REFERENCES myschema.accessibility (accessibility_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict
+)
+TABLESPACE pg_default;
+>>>>>>> Stashed changes
+
+ALTER TABLE myschema.auditorium
+    OWNER to postgres;
+--------------------------------------------------------------------
+   
+-- order
+--------------------------------------------------------------------
+CREATE SEQUENCE myschema.order_order_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+
+ALTER SEQUENCE myschema.order_order_id_seq
+    OWNER TO postgres;
+	
+CREATE TABLE IF NOT EXISTS myschema.auditorium
+(
+    order_id integer NOT NULL DEFAULT nextval('myschema.order_order_id_seq'::regclass),
+    offer_id int NOT NULL,
+	order_time time without time zone,
+    CONSTRAINT order_id_pkey PRIMARY KEY (order_id),
+	CONSTRAINT order_offer_id_fkey FOREIGN KEY (offer_id)
+        REFERENCES myschema.offer (offer_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE restrict
+)
+TABLESPACE pg_default;
+
+ALTER TABLE myschema.order
+    OWNER to postgres;
