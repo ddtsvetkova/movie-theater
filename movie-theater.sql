@@ -405,7 +405,7 @@ ALTER TABLE myschema.employee
 -- movie
 --------------------------------------------------------------------
 create type myschema.status as enum('скоро на экранах', 'новинка', 'уже в кино', 'вышел из проката');
-create type myschema.rating as enum('0+', '6+', '12+', '16+',' 18+')
+create type myschema.rating as enum('0+', '6+', '12+', '16+','18+')
 
 CREATE SEQUENCE myschema.movie_movie_id_seq
     INCREMENT 1
@@ -766,5 +766,106 @@ TABLESPACE pg_default;
 ALTER TABLE myschema.booking
     OWNER to postgres;
 --------------------------------------------------------------------
-   
 
+-- Заполнение таблиц
+
+SET search_path TO myschema
+
+INSERT INTO language (name)
+VALUES ('Russian'), ('English')
+
+SELECT * FROM language
+
+INSERT INTO role(role_name)
+VALUES ('director'), ('actor'), ('screenwriter'), ('camera operator'), ('voice actor'), ('producer')
+
+SELECT * FROM role
+
+INSERT INTO genre(genre_name)
+VALUES ('comedy'), ('action'), ('mystery'), ('drama'), ('sci-fi'), ('fantasy'), ('horror'), 
+('thriller'), ('romance'), ('adventure')
+
+SELECT * FROM genre
+
+INSERT INTO creator(creator_name)
+VALUES ('Guy Ritchie'), ('John August'), ('Will Smith'), ('Frank Welker'), ('Charlie Hunnam'), 
+('Colin Farrell'), ('Michelle Dockery'), ('Alan Stewart'), ('Юра Борисов'), ('Михаил Локшин'), 
+('Софья Присс')
+
+SELECT * FROM creator
+
+INSERT INTO movie(title, release, description, duration, language_id, rating, status)
+VALUES ('The Gentlemen', '2020-02-13', 'An American expat tries to sell off his highly profitable marijuana empire in London, triggering plots, schemes, bribery and blackmail in an attempt to steal his domain out from under him.',
+ '113 minutes', 2, '18+', 'вышел из проката'),
+('Aladdin', '2019-05-24', 'A kind-hearted street urchin and a power-hungry Grand Vizier vie for a magic lamp that has the power to make their deepest wishes come true.',
+ '128 minutes', 2, '6+', 'вышел из проката'),
+('Серебряные коньки', '2020-12-10', '1899 год, рождественский Петербург. Яркая праздничная жизнь бурлит на скованных льдом реках и каналах столицы. Накануне нового столетия судьба сводит тех, кому, казалось бы, не суждено было встретиться.',
+ '136 minutes', 1, '16+', 'вышел из проката')
+ 
+SELECT * FROM movie
+ 
+INSERT INTO movie_genre(movie_id, genre_id)
+VALUES (1, 1), (1, 2), (2, 1), (2, 6), (2, 9), (2, 10), (3, 4), (3, 9), (3, 10)
+
+SELECT * FROM movie_genre
+
+INSERT INTO cast_crew(movie_id, creator_id, in_cast, role_id)
+VALUES (1, 1, FALSE, 1),
+(1, 1, FALSE, 3),
+(1, 1, FALSE, 6),
+(1, 5, TRUE, 2),
+(1, 6, TRUE, 2),
+(1, 7, TRUE, 2),
+(1, 8, FALSE, 4),
+(2, 1, FALSE, 1),
+(2, 1, FALSE, 3),
+(2, 2, FALSE, 3),
+(2, 3, TRUE, 2),
+(2, 4, TRUE, 5),
+(3, 9, TRUE, 2),
+(3, 11, TRUE, 2),
+(3, 10, FALSE, 1)
+
+SELECT * FROM cast_crew
+
+-- Запросы
+
+-- 1. Получить количество доступных персон (один человек, занимающий несколько должностей,
+-- считается несколько раз) для каждого фильма
+
+SELECT title, count(cast_crew_id)
+FROM movie join cast_crew on movie.movie_id = cast_crew.movie_id
+GROUP BY title
+
+-- 2. Теперь один человек, занимающий несколько должностей на съемках, считается один раз
+-- (но Гай Ричи, который был режиссером двух фильмов, считается по разу для каждого фильма)
+
+SELECT title, count(DISTINCT creator_id)
+FROM movie join cast_crew USING(movie_id)
+		   join creator USING(creator_id)
+GROUP BY title
+
+-- 3. Получить количество доступных участников актерского состава (актеров/актеров озвучки) 
+-- для каждого фильма
+
+SELECT title, count(DISTINCT creator_id)
+FROM movie join cast_crew USING(movie_id)
+		   join creator USING(creator_id)
+WHERE in_cast
+GROUP BY title
+
+-- 4. Добавление персоны в актерский состав без знания идентификаторов
+
+INSERT INTO creator(creator_name) VALUES ('Naomi Scott')
+
+INSERT INTO cast_crew(movie_id, creator_id, in_cast, role_id)
+VALUES ( (SELECT movie_id FROM movie WHERE title = 'Aladdin'),
+	   (SELECT creator_id FROM creator WHERE creator_name = 'Naomi Scott'),
+	   TRUE,
+	   (SELECT role_id FROM role WHERE role_name = 'actor') )
+
+SELECT * FROM creator
+SELECT * FROM cast_crew
+
+-- DELETE FROM creator WHERE creator_name = 'Naomi Scott'
+-- DELETE FROM cast_crew WHERE cast_crew_id = 16
